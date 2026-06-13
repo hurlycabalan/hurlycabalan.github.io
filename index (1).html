@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hurly Cabalan – SOC Analyst</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #050d1a;
+      --surface:   #0a1628;
+      --card:      #0d1f3c;
+      --border:    #1a3560;
+      --accent:    #1e6fff;
+      --accent2:   #00c8ff;
+      --text:      #c8d8f0;
+      --muted:     #5a7499;
+      --white:     #eaf2ff;
+      --danger:    #ff4d6d;
+      --success:   #00e5a0;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Space Grotesk', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 64px;
+      background: rgba(5, 13, 26, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-logo span { color: var(--muted); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav ul a {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--accent2); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 80px clamp(1.5rem, 8vw, 8rem) 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* grid background */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 111, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 111, 255, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* radial glow */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(30,111,255,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent2);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent2);
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--text);
+      max-width: 480px;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(30,111,255,0.35);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent2);
+      background: rgba(0,200,255,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* ── TERMINAL ── */
+    .terminal {
+      background: #060f1e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(30,111,255,0.1);
+    }
+
+    .terminal-bar {
+      background: var(--card);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .terminal-title {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+    }
+
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.9;
+      min-height: 280px;
+    }
+
+    .t-prompt { color: var(--accent2); }
+    .t-cmd    { color: var(--white); }
+    .t-info   { color: var(--muted); }
+    .t-alert  { color: #ffb347; }
+    .t-danger { color: var(--danger); }
+    .t-good   { color: var(--success); }
+    .t-line   { display: block; opacity: 0; }
+    .t-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--accent2);
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem clamp(1.5rem, 8vw, 8rem);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-divider {
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── SKILLS STRIP ── */
+    .skills-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .skill-tag {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--accent2);
+      background: rgba(0,200,255,0.07);
+      border: 1px solid rgba(0,200,255,0.15);
+      padding: 0.3rem 0.75rem;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    .skill-tag:hover {
+      background: rgba(0,200,255,0.14);
+      border-color: var(--accent2);
+    }
+
+    /* ── PROJECTS ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.75rem;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: rgba(30,111,255,0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+
+    .project-card:hover::before { transform: scaleX(1); }
+
+    .project-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--success);
+      background: rgba(0,229,160,0.08);
+      border: 1px solid rgba(0,229,160,0.2);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .project-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .project-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .project-card p {
+      font-size: 0.875rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .project-tag {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .project-link {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent2);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.2s;
+    }
+
+    .project-link:hover { color: var(--white); }
+
+    /* ── CERTS ── */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .cert-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all 0.25s;
+    }
+
+    .cert-card:hover {
+      border-color: rgba(30,111,255,0.4);
+      transform: translateY(-3px);
+    }
+
+    .cert-issuer {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .cert-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.3;
+    }
+
+    .cert-date {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .cert-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      margin-top: 0.25rem;
+    }
+
+    .cert-status.active { color: var(--success); }
+    .cert-status.incoming { color: #ffb347; }
+    .cert-status.active::before,
+    .cert-status.incoming::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .cert-status.active::before { background: var(--success); animation: pulse 2s ease infinite; }
+    .cert-status.incoming::before { background: #ffb347; animation: pulse 2s ease infinite; }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent2);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    /* ── CONTACT ── */
+    .contact-inner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .contact-inner h2 { margin-bottom: 0.5rem; }
+    .contact-inner p { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem clamp(1.5rem, 8vw, 8rem);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      nav ul { display: none; }
+      .stat-row { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>~/</span>hurly-cabalan</div>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#certs">Certs</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-label">SOC Analyst · Doha, Qatar</div>
+      <h1>Hurly<br><span class="hero-title-accent">Cabalan</span></h1>
+      <p class="hero-sub">// Detection · Investigation · Response</p>
+      <p class="hero-desc">
+        Building detection coverage across 6-vendor enterprise environments. 
+        I investigate alerts end-to-end — from KQL query to containment decision — 
+        and document every step like a real incident.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Portfolio</a>
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="btn btn-outline">GitHub →</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="terminal-title">sentinel-triage.sh</span>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <span class="t-line"><span class="t-prompt">hurly@soc</span> <span class="t-cmd">~ $ ./triage --live</span></span>
+          <span class="t-line t-info">[*] Connecting to Microsoft Sentinel...</span>
+          <span class="t-line t-good">[+] Workspace: SOC-Workspace (East US)</span>
+          <span class="t-line t-info">[*] Ingesting 6-vendor telemetry...</span>
+          <span class="t-line t-info">[*] Sources: CrowdStrike · Okta · PaloAlto · AWS · GCP · MailGuard</span>
+          <span class="t-line t-alert">[!] ALERT: Brute force — 47.91.x.x → Okta</span>
+          <span class="t-line t-info">[*] Pivoting to CrowdStrike endpoint telemetry...</span>
+          <span class="t-line t-danger">[!] MATCH: Credential access T1110 confirmed</span>
+          <span class="t-line t-info">[*] Correlating AWS CloudTrail → GCP IAM events...</span>
+          <span class="t-line t-danger">[!] Cross-cloud lateral movement detected</span>
+          <span class="t-line t-good">[+] Account disabled · Incident escalated P1</span>
+          <span class="t-line"><span class="t-prompt">hurly@soc</span> <span class="t-cmd">~ $</span> <span class="t-cursor"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <div class="section-label">01 // Profile</div>
+    <h2>About Me</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>
+        Filipino expat based in Doha, Qatar (23 years). Former B2B sales professional turned 
+        SOC analyst — making a targeted career transition into cybersecurity with a focus on 
+        Qatar-based MSSPs.
+      </p>
+      <p>
+        I built a full 6-vendor Microsoft Sentinel training lab from scratch — simulating real 
+        attack chains across CrowdStrike, Okta, Palo Alto, AWS CloudTrail, GCP, and MailGuard365. 
+        Every investigation is documented end-to-end: alert triage, KQL hunting, MITRE mapping, 
+        TP/FP decision, containment, and lessons learned.
+      </p>
+      <p>
+        No commercial SOC experience yet — but I can walk you through any scenario right now.
+      </p>
+      <div class="skills-strip">
+        <span class="skill-tag">Microsoft Sentinel</span>
+        <span class="skill-tag">KQL</span>
+        <span class="skill-tag">Defender XDR</span>
+        <span class="skill-tag">Defender for Cloud</span>
+        <span class="skill-tag">MITRE ATT&CK</span>
+        <span class="skill-tag">CrowdStrike</span>
+        <span class="skill-tag">Okta</span>
+        <span class="skill-tag">Palo Alto</span>
+        <span class="skill-tag">AWS CloudTrail</span>
+        <span class="skill-tag">GCP IAM</span>
+        <span class="skill-tag">Incident Response</span>
+        <span class="skill-tag">Threat Hunting</span>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="stat-row">
+        <div class="stat-box">
+          <span class="stat-num">6</span>
+          <div class="stat-label">Vendors in Lab</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">10+</span>
+          <div class="stat-label">KQL Drills</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">5+</span>
+          <div class="stat-label">SC Series</div>
+        </div>
+      </div>
+      <div class="stat-row" style="margin-top:1rem;">
+        <div class="stat-box">
+          <span class="stat-num">23</span>
+          <div class="stat-label">Years in Qatar</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">TL-04</span>
+          <div class="stat-label">AWS→GCP Chain</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">40+</span>
+          <div class="stat-label">Kill Chain Events</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" style="max-width:1200px; margin:0 auto; padding: 2rem clamp(1.5rem,8vw,8rem) 6rem;">
+  <div class="reveal">
+    <div class="section-label">02 // Portfolio</div>
+    <h2>Lab Investigations</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="projects-grid">
+
+    <div class="project-card reveal">
+      <div class="project-badge">Active Lab</div>
+      <h3>TL-04 — Cross-Cloud Attack Chain<br>AWS CloudTrail → GCP IAM</h3>
+      <p>Real 40+ event kill chain. Threat actor <code style="color:var(--accent2);font-size:0.8em">mirage@pkwork.onmicrosoft.com</code> pivoted from AWS to GCP. Full KQL investigation, MITRE mapping, blast radius assessment, and containment playbook.</p>
+      <div class="project-tags">
+        <span class="project-tag">Microsoft Sentinel</span>
+        <span class="project-tag">AWS CloudTrail</span>
+        <span class="project-tag">GCP IAM</span>
+        <span class="project-tag">KQL</span>
+        <span class="project-tag">T1078 · T1530</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="project-link">→ GitHub</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-badge">Active Lab</div>
+      <h3>SC-01 — Brute Force Detection<br>Sentinel + Defender XDR</h3>
+      <p>End-to-end brute force investigation using Microsoft Sentinel analytics rules and Defender XDR correlation. Full alert triage, KQL query chain, TP/FP decision, and documented incident closure.</p>
+      <div class="project-tags">
+        <span class="project-tag">Microsoft Sentinel</span>
+        <span class="project-tag">Defender XDR</span>
+        <span class="project-tag">KQL</span>
+        <span class="project-tag">T1110 · T1110.001</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="project-link">→ GitHub</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-badge">Active Lab</div>
+      <h3>6-Vendor Sentinel Training Lab<br>Full SOC Environment</h3>
+      <p>Deployed a 6-vendor Microsoft Sentinel environment via ARM template: CrowdStrike, Okta, Palo Alto, AWS CloudTrail, GCP, and MailGuard365. TL-series and SC-series investigations across all vendors.</p>
+      <div class="project-tags">
+        <span class="project-tag">CrowdStrike</span>
+        <span class="project-tag">Okta</span>
+        <span class="project-tag">Palo Alto</span>
+        <span class="project-tag">AWS</span>
+        <span class="project-tag">GCP</span>
+        <span class="project-tag">MailGuard</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="project-link">→ GitHub</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-badge">Active Lab</div>
+      <h3>KQL Investigation Drills<br>SC-200 Exam Ready</h3>
+      <p>10 structured KQL drills covering brute force, C2 beacon detection, account takeover, and lateral movement. Drills 1–8 mapped to SC-200 exam scope. Queries built and validated inside live Sentinel workspace.</p>
+      <div class="project-tags">
+        <span class="project-tag">KQL</span>
+        <span class="project-tag">SecurityEvent</span>
+        <span class="project-tag">SigninLogs</span>
+        <span class="project-tag">CommonSecurityLog</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="project-link">→ GitHub</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CERTS -->
+<section id="certs" style="max-width:1200px; margin:0 auto; padding: 2rem clamp(1.5rem,8vw,8rem) 6rem;">
+  <div class="reveal">
+    <div class="section-label">03 // Credentials</div>
+    <h2>Certifications</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="certs-grid reveal">
+
+    <div class="cert-card">
+      <div class="cert-issuer">Google / Coursera</div>
+      <div class="cert-name">Google Cybersecurity Certificate</div>
+      <div class="cert-date">2024</div>
+      <div class="cert-status active">Active · Credly verified</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-issuer">ISC2</div>
+      <div class="cert-name">Certified in Cybersecurity (CC)</div>
+      <div class="cert-date">2024</div>
+      <div class="cert-status active">Candidate</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-issuer">Fortinet</div>
+      <div class="cert-name">NSE 1 &amp; NSE 2</div>
+      <div class="cert-date">2024</div>
+      <div class="cert-status active">Active</div>
+    </div>
+
+    <div class="cert-card" style="border-color: rgba(255,179,71,0.3);">
+      <div class="cert-issuer">Microsoft</div>
+      <div class="cert-name">SC-200: Security Operations Analyst</div>
+      <div class="cert-date">Target: July 2026</div>
+      <div class="cert-status incoming">In Progress</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="max-width:1200px; margin:0 auto; padding: 2rem clamp(1.5rem,8vw,8rem) 6rem;">
+  <div class="reveal">
+    <div class="contact-inner">
+      <div class="section-label" style="justify-content:center;">04 // Contact</div>
+      <h2>Let's Connect</h2>
+      <p>Open to SOC L1 opportunities at Qatar-based MSSPs.<br>I can walk you through any investigation scenario right now.</p>
+      <div class="contact-links">
+        <a href="https://github.com/hurlycabalan/Soc-Investigation" target="_blank" class="btn btn-primary">GitHub Portfolio</a>
+        <a href="https://www.linkedin.com/in/hurlycabalan" target="_blank" class="btn btn-outline">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Hurly Cabalan</span>
+  <span>Doha, Qatar · Built with GitHub Pages</span>
+</footer>
+
+<script>
+  // Terminal animation
+  const lines = document.querySelectorAll('.t-line');
+  lines.forEach((line, i) => {
+    setTimeout(() => {
+      line.style.opacity = '1';
+      line.style.transition = 'opacity 0.3s';
+    }, i * 350);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // stagger children
+        const children = e.target.querySelectorAll('.reveal');
+        children.forEach((child, i) => {
+          setTimeout(() => child.classList.add('visible'), i * 120);
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
